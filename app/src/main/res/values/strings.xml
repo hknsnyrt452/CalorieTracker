@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Calorie Tracker</string>
+    
+    <!-- Genel -->
+    <string name="save">Kaydet</string>
+    <string name="cancel">İptal</string>
+    <string name="edit">Düzenle</string>
+    <string name="delete">Sil</string>
+    
+    <!-- Öğün tipleri -->
+    <string name="breakfast">Kahvaltı</string>
+    <string name="lunch">Öğle Yemeği</string>
+    <string name="dinner">Akşam Yemeği</string>
+    <string name="snack">Ara Öğün</string>
+    
+    <!-- Form alanları -->
+    <string name="meal_name">Öğün Adı</string>
+    <string name="meal_type">Öğün Tipi</string>
+    <string name="food">Yemek</string>
+    <string name="grams">Gram</string>
+    <string name="date_time">Tarih ve Saat</string>
+    
+    <!-- Mesajlar -->
+    <string name="meal_added">Öğün eklendi</string>
+    <string name="meal_updated">Öğün güncellendi</string>
+    <string name="meal_deleted">Öğün silindi</string>
+    <string name="error_invalid_input">Lütfen tüm alanları doldurun</string>
+    
+    <!-- İstatistikler -->
+    <string name="total_calories">Toplam Kalori: %1$.1f kcal</string>
+    <string name="nutrient_info">Protein: %1$.1fg | Karbonhidrat: %2$.1fg | Yağ: %3$.1fg</string>
+    
+    <!-- Dialog mesajları -->
+    <string name="meal_delete_confirmation">Bu öğünü silmek istediğinizden emin misiniz?</string>
+    
+    <!-- Buton metinleri -->
+    <string name="add_meal">Öğün Ekle</string>
+    
+    <!-- Bottom Navigation -->
+    <string name="meals">Öğünler</string>
+    <string name="foods">Yemekler</string>
+    <string name="statistics">İstatistikler</string>
+</resources>

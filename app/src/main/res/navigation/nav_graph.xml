@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mealListFragment">
+
+    <fragment
+        android:id="@+id/mealListFragment"
+        android:name="com.example.calorietracker.ui.meal.list.MealListFragment"
+        android:label="Öğünler" />
+
+    <fragment
+        android:id="@+id/foodListFragment"
+        android:name="com.example.calorietracker.ui.food.list.FoodListFragment"
+        android:label="Yemekler" />
+
+    <fragment
+        android:id="@+id/statisticsFragment"
+        android:name="com.example.calorietracker.ui.statistics.StatisticsFragment"
+        android:label="İstatistikler" />
+
+    <fragment
+        android:id="@+id/addMealFragment"
+        android:name="com.example.calorietracker.ui.meal.AddMealFragment"
+        android:label="Öğün Ekle" />
+
+    <fragment
+        android:id="@+id/editMealFragment"
+        android:name="com.example.calorietracker.ui.meal.edit.EditMealFragment"
+        android:label="Öğün Düzenle">
+        <argument
+            android:name="mealId"
+            app:argType="long" />
+    </fragment>
+</navigation> 
