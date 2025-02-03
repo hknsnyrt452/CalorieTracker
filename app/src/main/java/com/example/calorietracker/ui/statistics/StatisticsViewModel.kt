@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.calorietracker.data.entity.MealType
 import com.example.calorietracker.data.repository.MealRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import java.time.LocalDateTime
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
     private val repository: MealRepository
