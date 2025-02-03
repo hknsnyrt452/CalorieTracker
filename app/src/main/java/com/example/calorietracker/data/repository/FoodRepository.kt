@@ -10,7 +10,7 @@ class FoodRepository @Inject constructor(
 ) {
     fun getAllFoods(): Flow<List<Food>> = foodDao.getAllFoods()
 
-    suspend fun insertFood(food: Food): Long = foodDao.insertFood(food)
+    suspend fun insertFood(food: Food) = foodDao.insertFood(food)
 
     suspend fun updateFood(food: Food) = foodDao.updateFood(food)
 

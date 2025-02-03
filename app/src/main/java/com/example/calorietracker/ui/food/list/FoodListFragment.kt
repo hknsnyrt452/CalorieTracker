@@ -27,6 +27,11 @@ class FoodListFragment : Fragment(R.layout.fragment_food_list) {
         setupRecyclerView()
         setupFab()
         observeViewModel()
+
+        // Test için örnek veri ekleme
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.insertTestData()
+        }
     }
 
     private fun setupRecyclerView() {

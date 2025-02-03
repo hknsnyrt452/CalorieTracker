@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FoodDao {
-    @Query("SELECT * FROM foods")
+    @Query("SELECT * FROM foods ORDER BY name ASC")
     fun getAllFoods(): Flow<List<Food>>
 
     @Insert
