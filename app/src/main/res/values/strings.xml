@@ -41,4 +41,7 @@
     <string name="meals">Öğünler</string>
     <string name="foods">Yemekler</string>
     <string name="statistics">İstatistikler</string>
+    
+    <!-- Yeni string -->
+    <string name="add_food">Yemek Ekle</string>
 </resources>
