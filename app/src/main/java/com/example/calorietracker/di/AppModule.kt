@@ -3,7 +3,6 @@ package com.example.calorietracker.di
 import android.content.Context
 import androidx.room.Room
 import com.example.calorietracker.data.database.CalorieTrackerDatabase
-import com.example.calorietracker.data.repository.FoodRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,13 +24,5 @@ object AppModule {
             CalorieTrackerDatabase::class.java,
             "calorie_tracker_db"
         ).build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideFoodRepository(
-        database: CalorieTrackerDatabase
-    ): FoodRepository {
-        return FoodRepository(database.foodDao())
     }
 } 

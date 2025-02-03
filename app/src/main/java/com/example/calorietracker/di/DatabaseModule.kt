@@ -1,8 +1,6 @@
 package com.example.calorietracker.di
 
-import android.content.Context
-import androidx.room.Room
-import com.example.calorietracker.data.AppDatabase
+import com.example.calorietracker.data.database.CalorieTrackerDatabase
 import com.example.calorietracker.data.dao.FoodDao
 import com.example.calorietracker.data.dao.MealDao
 import com.example.calorietracker.data.repository.FoodRepository
@@ -10,7 +8,6 @@ import com.example.calorietracker.data.repository.MealRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -19,17 +16,7 @@ import javax.inject.Singleton
 object DatabaseModule {
 
     @Provides
-    @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "calorie_tracker_db"
-        ).build()
-    }
-
-    @Provides
-    fun provideMealDao(database: AppDatabase): MealDao {
+    fun provideMealDao(database: CalorieTrackerDatabase): MealDao {
         return database.mealDao()
     }
 
@@ -40,7 +27,7 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideFoodDao(database: AppDatabase): FoodDao {
+    fun provideFoodDao(database: CalorieTrackerDatabase): FoodDao {
         return database.foodDao()
     }
 
