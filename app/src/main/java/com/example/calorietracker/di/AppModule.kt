@@ -1,9 +1,9 @@
 package com.example.calorietracker.di
 
 import android.content.Context
+import androidx.room.Room
 import com.example.calorietracker.data.database.CalorieTrackerDatabase
 import com.example.calorietracker.data.repository.FoodRepository
-import com.example.calorietracker.data.repository.MealRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,10 +17,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(
+    fun provideCalorieTrackerDatabase(
         @ApplicationContext context: Context
     ): CalorieTrackerDatabase {
-        return CalorieTrackerDatabase.getDatabase(context)
+        return Room.databaseBuilder(
+            context,
+            CalorieTrackerDatabase::class.java,
+            "calorie_tracker_db"
+        ).build()
     }
 
     @Provides
@@ -29,13 +33,5 @@ object AppModule {
         database: CalorieTrackerDatabase
     ): FoodRepository {
         return FoodRepository(database.foodDao())
-    }
-
-    @Provides
-    @Singleton
-    fun provideMealRepository(
-        database: CalorieTrackerDatabase
-    ): MealRepository {
-        return MealRepository(database.mealDao())
     }
 } 

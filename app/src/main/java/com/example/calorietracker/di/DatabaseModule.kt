@@ -34,6 +34,7 @@ object DatabaseModule {
     }
 
     @Provides
+    @Singleton
     fun provideMealRepository(mealDao: MealDao): MealRepository {
         return MealRepository(mealDao)
     }
@@ -44,6 +45,7 @@ object DatabaseModule {
     }
 
     @Provides
+    @Singleton
     fun provideFoodRepository(foodDao: FoodDao): FoodRepository {
         return FoodRepository(foodDao)
     }
