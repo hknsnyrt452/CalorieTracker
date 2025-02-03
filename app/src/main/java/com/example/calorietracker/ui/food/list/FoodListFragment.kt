@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.calorietracker.R
 import com.example.calorietracker.databinding.FragmentFoodListBinding
+import com.example.calorietracker.data.entity.Food
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -44,8 +45,8 @@ class FoodListFragment : Fragment(R.layout.fragment_food_list) {
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.foods.collect { foods ->
-                foodAdapter.submitList(foods)
+            viewModel.foods.collect { foodList: List<Food> ->
+                foodAdapter.submitList(foodList)
             }
         }
     }
