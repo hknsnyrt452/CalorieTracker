@@ -7,7 +7,14 @@
     <fragment
         android:id="@+id/mealListFragment"
         android:name="com.example.calorietracker.ui.meal.list.MealListFragment"
-        android:label="Öğünler" />
+        android:label="Öğünler">
+        <action
+            android:id="@+id/action_mealListFragment_to_addMealFragment"
+            app:destination="@id/addMealFragment" />
+        <action
+            android:id="@+id/action_mealListFragment_to_editMealFragment"
+            app:destination="@id/editMealFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/foodListFragment"
