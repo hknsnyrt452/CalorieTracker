@@ -44,4 +44,8 @@
     
     <!-- Yeni string -->
     <string name="add_food">Yemek Ekle</string>
+    
+    <!-- Hedef kalori -->
+    <string name="set_target_calories">Hedef Kalori Ayarla</string>
+    <string name="target_calories">Hedef Kalori:</string>
 </resources>

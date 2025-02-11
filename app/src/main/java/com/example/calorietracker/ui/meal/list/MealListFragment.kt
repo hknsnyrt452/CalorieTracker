@@ -2,6 +2,8 @@ package com.example.calorietracker.ui.meal.list
 
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
+import android.text.InputType
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +19,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import androidx.core.os.bundleOf
+import javax.inject.Inject
+import com.example.calorietracker.data.preferences.SettingsManager
 
 @AndroidEntryPoint
 class MealListFragment : Fragment(R.layout.fragment_meal_list) {
@@ -24,6 +28,9 @@ class MealListFragment : Fragment(R.layout.fragment_meal_list) {
     private val binding get() = _binding!!
     private val viewModel: MealListViewModel by viewModels()
     
+    @Inject
+    lateinit var settingsManager: SettingsManager
+
     private lateinit var breakfastAdapter: MealAdapter
     private lateinit var lunchAdapter: MealAdapter
     private lateinit var dinnerAdapter: MealAdapter
@@ -127,6 +134,11 @@ class MealListFragment : Fragment(R.layout.fragment_meal_list) {
             btnAddSnack.setOnClickListener {
                 navigateToAddMealFragment(MealType.SNACK)
             }
+
+            // Hedef kalori ayarı için tıklama
+            layoutTarget.setOnClickListener {
+                showTargetCaloriesDialog()
+            }
         }
     }
 
@@ -142,9 +154,9 @@ class MealListFragment : Fragment(R.layout.fragment_meal_list) {
             .sumOf { it.calories }
         
         binding.apply {
-            tvTarget.text = "2.080"
+            tvTarget.text = settingsManager.targetCalories.toString()
             tvConsumed.text = totalCalories.toString()
-            tvRemaining.text = (2080 - totalCalories).toString()
+            tvRemaining.text = (settingsManager.targetCalories - totalCalories).toString()
         }
     }
 
@@ -154,6 +166,26 @@ class MealListFragment : Fragment(R.layout.fragment_meal_list) {
             .setMessage(R.string.meal_delete_confirmation)
             .setPositiveButton(R.string.delete) { _, _ ->
                 viewModel.deleteMeal(meal)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showTargetCaloriesDialog() {
+        val editText = EditText(requireContext()).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER
+            setText(settingsManager.targetCalories.toString())
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.set_target_calories)
+            .setView(editText)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val newTarget = editText.text.toString().toIntOrNull() ?: return@setPositiveButton
+                if (newTarget > 0) {
+                    settingsManager.targetCalories = newTarget
+                    updateCalorieCalculations(viewModel.groupedMeals.value)
+                }
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
