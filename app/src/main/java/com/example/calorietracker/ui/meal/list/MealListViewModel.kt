@@ -30,6 +30,16 @@ class MealListViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
+    val groupedMeals: StateFlow<Map<MealType, List<Meal>>> = repository.getDailyMeals()
+        .map { meals ->
+            meals.groupBy { it.type }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyMap()
+        )
+
     fun setDate(date: LocalDateTime) {
         _selectedDate.value = date
     }
