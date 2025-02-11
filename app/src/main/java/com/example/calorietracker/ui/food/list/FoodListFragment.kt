@@ -14,6 +14,7 @@ import com.example.calorietracker.ui.food.FoodAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import androidx.navigation.fragment.findNavController
 
 @AndroidEntryPoint
 class FoodListFragment : Fragment(R.layout.fragment_food_list) {
@@ -27,8 +28,8 @@ class FoodListFragment : Fragment(R.layout.fragment_food_list) {
         _binding = FragmentFoodListBinding.bind(view)
         
         setupRecyclerView()
-        setupFab()
-        observeViewModel()
+        setupListeners()
+        observeFoods()
 
         // Test verilerini kaldırdık çünkü veritabanında zaten varsayılan veriler var
     }
@@ -50,13 +51,13 @@ class FoodListFragment : Fragment(R.layout.fragment_food_list) {
         }
     }
 
-    private fun setupFab() {
+    private fun setupListeners() {
         binding.fabAddFood.setOnClickListener {
-            // TODO: Navigate to add food screen
+            findNavController().navigate(R.id.action_foodListFragment_to_addFoodFragment)
         }
     }
 
-    private fun observeViewModel() {
+    private fun observeFoods() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.foods.collect { foodList ->
                 foodAdapter.submitList(foodList)

@@ -37,7 +37,16 @@
     <fragment
         android:id="@+id/foodListFragment"
         android:name="com.example.calorietracker.ui.food.list.FoodListFragment"
-        android:label="Yemekler" />
+        android:label="Yemekler">
+        <action
+            android:id="@+id/action_foodListFragment_to_addFoodFragment"
+            app:destination="@id/addFoodFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addFoodFragment"
+        android:name="com.example.calorietracker.ui.food.add.AddFoodFragment"
+        android:label="Yemek Ekle" />
 
     <fragment
         android:id="@+id/statisticsFragment"

@@ -48,4 +48,11 @@
     <!-- Hedef kalori -->
     <string name="set_target_calories">Hedef Kalori Ayarla</string>
     <string name="target_calories">Hedef Kalori:</string>
+    
+    <!-- Yemek ekleme -->
+    <string name="food_name">Yemek Adı</string>
+    <string name="calories_per_100g">100g başına kalori</string>
+    <string name="protein_per_100g">100g başına protein (g)</string>
+    <string name="carbs_per_100g">100g başına karbonhidrat (g)</string>
+    <string name="fat_per_100g">100g başına yağ (g)</string>
 </resources>
