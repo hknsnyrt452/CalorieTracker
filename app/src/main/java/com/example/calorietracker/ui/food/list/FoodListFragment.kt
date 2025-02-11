@@ -6,9 +6,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.calorietracker.R
 import com.example.calorietracker.databinding.FragmentFoodListBinding
 import com.example.calorietracker.data.entity.Food
+import com.example.calorietracker.ui.food.FoodAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -28,17 +30,23 @@ class FoodListFragment : Fragment(R.layout.fragment_food_list) {
         setupFab()
         observeViewModel()
 
-        // Test için örnek veri ekleme
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.insertTestData()
-        }
+        // Test verilerini kaldırdık çünkü veritabanında zaten varsayılan veriler var
     }
 
     private fun setupRecyclerView() {
-        foodAdapter = FoodAdapter()
+        foodAdapter = FoodAdapter(
+            onEditClick = { food ->
+                // TODO: Navigate to edit screen
+            },
+            onDeleteClick = { food ->
+                viewModel.deleteFood(food)
+            }
+        )
+        
         binding.rvFoods.apply {
             adapter = foodAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         }
     }
 
@@ -50,8 +58,12 @@ class FoodListFragment : Fragment(R.layout.fragment_food_list) {
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.foods.collect { foodList: List<Food> ->
+            viewModel.foods.collect { foodList ->
                 foodAdapter.submitList(foodList)
+                
+                // Boş liste kontrolü
+                binding.tvEmptyList.visibility = if (foodList.isEmpty()) View.VISIBLE else View.GONE
+                binding.rvFoods.visibility = if (foodList.isEmpty()) View.GONE else View.VISIBLE
             }
         }
     }

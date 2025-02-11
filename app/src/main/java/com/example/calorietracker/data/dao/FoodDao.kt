@@ -20,4 +20,10 @@ interface FoodDao {
 
     @Query("SELECT * FROM foods WHERE id = :foodId")
     suspend fun getFoodById(foodId: Long): Food?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(foods: List<Food>)
+
+    @Query("SELECT * FROM foods")
+    suspend fun getAllFoodsOneShot(): List<Food>
 } 
