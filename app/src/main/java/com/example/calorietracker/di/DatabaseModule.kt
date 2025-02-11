@@ -5,8 +5,10 @@ import androidx.room.Room
 import com.example.calorietracker.data.database.CalorieTrackerDatabase
 import com.example.calorietracker.data.dao.FoodDao
 import com.example.calorietracker.data.dao.MealDao
+import com.example.calorietracker.data.dao.WeightDao
 import com.example.calorietracker.data.repository.FoodRepository
 import com.example.calorietracker.data.repository.MealRepository
+import com.example.calorietracker.data.repository.WeightRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,6 +41,11 @@ object DatabaseModule {
     }
 
     @Provides
+    fun provideWeightDao(database: CalorieTrackerDatabase): WeightDao {
+        return database.weightDao()
+    }
+
+    @Provides
     fun provideFoodRepository(foodDao: FoodDao): FoodRepository {
         return FoodRepository(foodDao)
     }
@@ -46,5 +53,10 @@ object DatabaseModule {
     @Provides
     fun provideMealRepository(mealDao: MealDao, foodDao: FoodDao): MealRepository {
         return MealRepository(mealDao, foodDao)
+    }
+
+    @Provides
+    fun provideWeightRepository(weightDao: WeightDao): WeightRepository {
+        return WeightRepository(weightDao)
     }
 } 

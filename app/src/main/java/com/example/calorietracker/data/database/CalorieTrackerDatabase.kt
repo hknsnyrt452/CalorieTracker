@@ -10,21 +10,28 @@ import com.example.calorietracker.data.converter.DateTimeConverters
 import com.example.calorietracker.data.converter.Converters
 import com.example.calorietracker.data.dao.FoodDao
 import com.example.calorietracker.data.dao.MealDao
+import com.example.calorietracker.data.dao.WeightDao
 import com.example.calorietracker.data.entity.Food
 import com.example.calorietracker.data.entity.Meal
+import com.example.calorietracker.data.entity.WeightRecord
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [Food::class, Meal::class],
-    version = 3,
+    entities = [
+        Food::class,
+        Meal::class,
+        WeightRecord::class
+    ],
+    version = 1,
     exportSchema = false
 )
 @TypeConverters(DateTimeConverters::class)
 abstract class CalorieTrackerDatabase : RoomDatabase() {
     abstract fun foodDao(): FoodDao
     abstract fun mealDao(): MealDao
+    abstract fun weightDao(): WeightDao
 
     companion object {
         @Volatile

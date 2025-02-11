@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.calorietracker.data.entity.MealType
 import com.example.calorietracker.databinding.FragmentStatisticsBinding
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,6 +25,14 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import androidx.core.content.ContextCompat
 import com.example.calorietracker.R
 import kotlinx.coroutines.flow.collect
+import com.example.calorietracker.data.entity.WeightRecord
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import android.widget.EditText
+import android.text.InputType
+import javax.inject.Inject
+import com.example.calorietracker.data.preferences.SettingsManager
+import com.example.calorietracker.ui.statistics.StatisticsViewModel.NutrientInfo
+import kotlinx.coroutines.flow.collectLatest
 
 @AndroidEntryPoint
 class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
@@ -33,128 +42,137 @@ class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
 
     private val viewModel: StatisticsViewModel by viewModels()
 
+    @Inject
+    lateinit var settingsManager: SettingsManager
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentStatisticsBinding.bind(view)
 
-        setupCharts()
-        setupDatePicker()
+        setupViews()
         setupObservers()
     }
 
-    private fun setupCharts() {
-        // Pie Chart ayarları
-        binding.pieChartMeals.apply {
-            description.isEnabled = false
-            setUsePercentValues(true)
-            legend.isEnabled = true
-            setEntryLabelTextSize(12f)
-            setEntryLabelColor(Color.BLACK)
-        }
-
-        // Line Chart ayarları
-        binding.lineChartWeekly.apply {
-            description.isEnabled = false
-            legend.isEnabled = false
-            xAxis.valueFormatter = IndexAxisValueFormatter(
-                (0..6).map { "Gün $it" }.toTypedArray()
-            )
-            axisRight.isEnabled = false
-        }
-    }
-
-    private fun setupDatePicker() {
-        updateDateButtonText(LocalDateTime.now())
-        
-        binding.btnSelectDate.setOnClickListener {
-            val datePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Tarih Seçin")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .build()
-
-            datePicker.addOnPositiveButtonClickListener { selection ->
-                val selectedDate = LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(selection),
-                    ZoneId.systemDefault()
-                )
-                viewModel.setDate(selectedDate)
-                updateDateButtonText(selectedDate)
+    private fun setupViews() {
+        binding.apply {
+            // Kilo hedefi ayarı için tıklama
+            layoutTargetWeight.setOnClickListener {
+                showTargetWeightDialog()
             }
 
-            datePicker.show(parentFragmentManager, "date_picker")
-        }
-    }
+            // Yeni kilo girişi için FAB
+            fabAddWeight.setOnClickListener {
+                showAddWeightDialog()
+            }
 
-    private fun updateDateButtonText(date: LocalDateTime) {
-        val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
-        binding.btnSelectDate.text = date.format(formatter)
+            // LineChart ayarları
+            lineChart.apply {
+                description.isEnabled = false
+                legend.isEnabled = true
+                setTouchEnabled(true)
+                setScaleEnabled(true)
+                setPinchZoom(true)
+
+                xAxis.apply {
+                    position = XAxis.XAxisPosition.BOTTOM
+                    granularity = 1f
+                    setDrawGridLines(false)
+                }
+
+                axisLeft.apply {
+                    setDrawGridLines(true)
+                    setDrawAxisLine(true)
+                }
+
+                axisRight.isEnabled = false
+            }
+        }
     }
 
     private fun setupObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.dailyStats.collect { stats: DailyStats ->
-                updateDailyStats(stats)
-                updatePieChart(stats.mealTypeDistribution)
+            // Toplam kalori ve besin değerleri
+            viewModel.dailyNutrients.collectLatest { nutrients: NutrientInfo ->
+                binding.apply {
+                    tvTotalCalories.text = getString(R.string.total_calories, nutrients.calories)
+                    tvNutrients.text = getString(
+                        R.string.nutrient_info,
+                        nutrients.protein,
+                        nutrients.carbs,
+                        nutrients.fat
+                    )
+                }
             }
         }
 
+        // Kilo grafiği
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.weeklyStats.collect { stats: WeeklyStats ->
-                updateLineChart(stats.dailyCalories)
+            viewModel.weightRecords.collectLatest { records: List<WeightRecord> ->
+                updateWeightChart(records)
             }
         }
     }
 
-    private fun updateDailyStats(stats: DailyStats) {
-        binding.tvTotalCalories.text = getString(R.string.total_calories, stats.totalCalories)
-        binding.tvTotalNutrients.text = getString(
-            R.string.nutrient_info,
-            stats.totalProtein,
-            stats.totalCarbs,
-            stats.totalFat
-        )
-    }
-
-    private fun updatePieChart(distribution: Map<MealType, Float>) {
-        val entries = distribution.map { (type, value) ->
-            PieEntry(value, type.name)
+    private fun updateWeightChart(records: List<WeightRecord>) {
+        val entries = records.mapIndexed { index, record ->
+            Entry(index.toFloat(), record.weight)
         }
 
-        val colors = listOf(
-            ContextCompat.getColor(requireContext(), R.color.chart_breakfast),
-            ContextCompat.getColor(requireContext(), R.color.chart_lunch),
-            ContextCompat.getColor(requireContext(), R.color.chart_dinner),
-            ContextCompat.getColor(requireContext(), R.color.chart_snack)
-        )
-
-        val dataSet = PieDataSet(entries, getString(R.string.meal_type)).apply {
-            this.colors = colors
-            valueTextSize = 14f
-            valueTextColor = Color.BLACK
-        }
-
-        binding.pieChartMeals.data = PieData(dataSet)
-        binding.pieChartMeals.invalidate()
-    }
-
-    private fun updateLineChart(dailyCalories: Map<LocalDateTime, Float>) {
-        val entries = dailyCalories.entries.sortedBy { it.key }.map { (date, calories) ->
-            Entry(
-                date.toLocalDate().dayOfWeek.value.toFloat(),
-                calories
-            )
-        }
-
-        val dataSet = LineDataSet(entries, "Günlük Kalori").apply {
-            color = Color.rgb(64, 89, 128)
+        val dataSet = LineDataSet(entries, "Kilo").apply {
+            color = Color.BLUE
+            setCircleColor(Color.BLUE)
             lineWidth = 2f
-            setCircleColor(Color.rgb(64, 89, 128))
             circleRadius = 4f
-            valueTextSize = 10f
+            setDrawValues(false)
         }
 
-        binding.lineChartWeekly.data = LineData(dataSet)
-        binding.lineChartWeekly.invalidate()
+        val dates = records.map { record ->
+            record.date.format(DateTimeFormatter.ofPattern("dd/MM"))
+        }
+
+        binding.lineChart.apply {
+            data = LineData(dataSet)
+            xAxis.valueFormatter = IndexAxisValueFormatter(dates)
+            invalidate()
+        }
+    }
+
+    private fun showAddWeightDialog() {
+        val editText = EditText(requireContext()).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.add_weight)
+            .setView(editText)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val weight = editText.text.toString().toFloatOrNull()
+                if (weight != null && weight > 0) {
+                    viewModel.addWeightRecord(weight)
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showTargetWeightDialog() {
+        val editText = EditText(requireContext()).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            setText(settingsManager.targetWeight.toString())
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.set_target_weight)
+            .setView(editText)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val weight = editText.text.toString().toFloatOrNull()
+                if (weight != null && weight > 0) {
+                    settingsManager.targetWeight = weight
+                    updateWeightChart(viewModel.weightRecords.value)
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     override fun onDestroyView() {

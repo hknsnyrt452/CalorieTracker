@@ -4,16 +4,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.calorietracker.data.entity.MealType
 import com.example.calorietracker.data.repository.MealRepository
+import com.example.calorietracker.data.repository.WeightRepository
+import com.example.calorietracker.data.entity.WeightRecord
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.time.LocalDate
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
-    private val repository: MealRepository
+    private val mealRepository: MealRepository,
+    private val weightRepository: WeightRepository
 ) : ViewModel() {
 
     private val _selectedDate = MutableStateFlow(LocalDateTime.now())
@@ -22,7 +27,7 @@ class StatisticsViewModel @Inject constructor(
     val dailyStats = selectedDate.flatMapLatest { date ->
         val startOfDay = date.toLocalDate().atStartOfDay()
         val endOfDay = date.toLocalDate().plusDays(1).atStartOfDay()
-        repository.getMealsByDateRange(startOfDay, endOfDay)
+        mealRepository.getMealsByDateRange(startOfDay, endOfDay)
     }.map { meals ->
         DailyStats(
             totalCalories = 0f,  // Şimdilik 0 olarak bırakıyoruz
@@ -42,7 +47,7 @@ class StatisticsViewModel @Inject constructor(
         val startOfWeek = date.toLocalDate().minusDays(6).atStartOfDay()
         val endOfWeek = date.toLocalDate().plusDays(1).atStartOfDay()
         
-        repository.getMealsByDateRange(startOfWeek, endOfWeek)
+        mealRepository.getMealsByDateRange(startOfWeek, endOfWeek)
     }.map { meals ->
         val dailyCalories = meals.groupBy { 
             it.dateTime.toLocalDate().atStartOfDay() 
@@ -56,9 +61,40 @@ class StatisticsViewModel @Inject constructor(
         initialValue = WeeklyStats()
     )
 
+    val dailyNutrients = mealRepository.getDailyNutrients()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = NutrientInfo(0f, 0f, 0f, 0f)
+        )
+
+    val weightRecords = weightRepository.getWeightRecordsForLastMonth()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
     fun setDate(date: LocalDateTime) {
         _selectedDate.value = date
     }
+
+    fun addWeightRecord(weight: Float) {
+        viewModelScope.launch {
+            val record = WeightRecord(
+                date = LocalDate.now(),
+                weight = weight
+            )
+            weightRepository.insertWeightRecord(record)
+        }
+    }
+
+    data class NutrientInfo(
+        val calories: Float,
+        val protein: Float,
+        val carbs: Float,
+        val fat: Float
+    )
 }
 
 data class DailyStats(

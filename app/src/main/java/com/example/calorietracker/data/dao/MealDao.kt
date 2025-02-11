@@ -41,7 +41,6 @@ interface MealDao {
     @Query("SELECT * FROM meals WHERE id = :id")
     suspend fun getMealById(id: Long): Meal?
 
-    // Bugünün öğünlerini getiren fonksiyonu güncelliyoruz
     @Query("""
         SELECT * FROM meals 
         WHERE dateTime >= :startOfDay AND dateTime < :endOfDay

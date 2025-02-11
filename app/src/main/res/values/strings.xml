@@ -55,4 +55,12 @@
     <string name="protein_per_100g">100g başına protein (g)</string>
     <string name="carbs_per_100g">100g başına karbonhidrat (g)</string>
     <string name="fat_per_100g">100g başına yağ (g)</string>
+    
+    <!-- Kilo takibi -->
+    <string name="target_weight">Hedef Kilo:</string>
+    <string name="add_weight">Kilo Ekle</string>
+    <string name="current_weight">Mevcut Kilo:</string>
+    <string name="weight_kg">%.1f kg</string>
+    <string name="set_target_weight">Hedef Kilo Ayarla</string>
+    <string name="weight_history">Kilo Geçmişi</string>
 </resources>
