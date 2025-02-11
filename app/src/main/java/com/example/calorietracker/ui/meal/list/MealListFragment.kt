@@ -16,7 +16,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.time.format.DateTimeFormatter
 import androidx.core.os.bundleOf
 
 @AndroidEntryPoint
@@ -132,8 +131,10 @@ class MealListFragment : Fragment(R.layout.fragment_meal_list) {
     }
 
     private fun navigateToAddMealFragment(mealType: MealType) {
-        val bundle = bundleOf("mealType" to mealType)
-        findNavController().navigate(R.id.action_mealListFragment_to_addMealFragment, bundle)
+        findNavController().navigate(
+            R.id.action_mealListFragment_to_addMealFragment,
+            bundleOf("mealType" to mealType)
+        )
     }
 
     private fun updateCalorieCalculations(groupedMeals: Map<MealType, List<Meal>>) {

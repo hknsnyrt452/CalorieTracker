@@ -21,25 +21,15 @@ class AddMealFragment : Fragment(R.layout.fragment_add_meal) {
     private val binding get() = _binding!!
     private val viewModel: AddMealViewModel by viewModels()
     private var foodList: List<Food> = emptyList()
-    private val args: AddMealFragmentArgs by navArgs()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentAddMealBinding.bind(view)
 
-        setupViews()
-        observeFoods()
-        setInitialMealType()
-    }
+        val mealType = arguments?.getSerializable("mealType") as? MealType ?: MealType.BREAKFAST
 
-    private fun setInitialMealType() {
-        val radioButtonId = when (args.mealType) {
-            MealType.BREAKFAST -> R.id.rbBreakfast
-            MealType.LUNCH -> R.id.rbLunch
-            MealType.DINNER -> R.id.rbDinner
-            MealType.SNACK -> R.id.rbSnack
-        }
-        binding.rgMealType.check(radioButtonId)
+        setupViews(mealType)
+        observeFoods()
     }
 
     private fun observeFoods() {
@@ -62,15 +52,10 @@ class AddMealFragment : Fragment(R.layout.fragment_add_meal) {
         binding.spinnerFood.adapter = adapter
     }
 
-    private fun setupViews() {
+    private fun setupViews(mealType: MealType) {
         binding.btnSave.setOnClickListener {
             val name = binding.etName.text.toString()
-            val type = when (binding.rgMealType.checkedRadioButtonId) {
-                R.id.rbBreakfast -> MealType.BREAKFAST
-                R.id.rbLunch -> MealType.LUNCH
-                R.id.rbDinner -> MealType.DINNER
-                else -> MealType.SNACK
-            }
+            val type = mealType
             
             val selectedPosition = binding.spinnerFood.selectedItemPosition
             if (selectedPosition >= 0 && selectedPosition < foodList.size) {

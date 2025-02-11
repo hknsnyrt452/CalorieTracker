@@ -3,6 +3,7 @@ package com.example.calorietracker.ui.meal.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.calorietracker.data.entity.Meal
+import com.example.calorietracker.data.entity.MealType
 import com.example.calorietracker.data.repository.MealRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
