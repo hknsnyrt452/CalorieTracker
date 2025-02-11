@@ -1,5 +1,7 @@
 package com.example.calorietracker.di
 
+import android.content.Context
+import androidx.room.Room
 import com.example.calorietracker.data.database.CalorieTrackerDatabase
 import com.example.calorietracker.data.dao.FoodDao
 import com.example.calorietracker.data.dao.MealDao
@@ -8,6 +10,7 @@ import com.example.calorietracker.data.repository.MealRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -16,14 +19,13 @@ import javax.inject.Singleton
 object DatabaseModule {
 
     @Provides
-    fun provideMealDao(database: CalorieTrackerDatabase): MealDao {
-        return database.mealDao()
-    }
-
-    @Provides
     @Singleton
-    fun provideMealRepository(mealDao: MealDao): MealRepository {
-        return MealRepository(mealDao)
+    fun provideDatabase(@ApplicationContext context: Context): CalorieTrackerDatabase {
+        return Room.databaseBuilder(
+            context,
+            CalorieTrackerDatabase::class.java,
+            "calorie_tracker_database"
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
@@ -32,8 +34,17 @@ object DatabaseModule {
     }
 
     @Provides
-    @Singleton
+    fun provideMealDao(database: CalorieTrackerDatabase): MealDao {
+        return database.mealDao()
+    }
+
+    @Provides
     fun provideFoodRepository(foodDao: FoodDao): FoodRepository {
         return FoodRepository(foodDao)
+    }
+
+    @Provides
+    fun provideMealRepository(mealDao: MealDao, foodDao: FoodDao): MealRepository {
+        return MealRepository(mealDao, foodDao)
     }
 } 

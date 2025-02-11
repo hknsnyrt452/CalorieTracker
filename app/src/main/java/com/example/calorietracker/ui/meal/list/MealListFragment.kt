@@ -17,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
+import androidx.core.os.bundleOf
 
 @AndroidEntryPoint
 class MealListFragment : Fragment(R.layout.fragment_meal_list) {
@@ -113,27 +114,26 @@ class MealListFragment : Fragment(R.layout.fragment_meal_list) {
     private fun setupListeners() {
         binding.apply {
             btnAddBreakfast.setOnClickListener {
-                navigateToAddMeal(MealType.BREAKFAST)
+                navigateToAddMealFragment(MealType.BREAKFAST)
             }
             
             btnAddLunch.setOnClickListener {
-                navigateToAddMeal(MealType.LUNCH)
+                navigateToAddMealFragment(MealType.LUNCH)
             }
             
             btnAddDinner.setOnClickListener {
-                navigateToAddMeal(MealType.DINNER)
+                navigateToAddMealFragment(MealType.DINNER)
             }
             
             btnAddSnack.setOnClickListener {
-                navigateToAddMeal(MealType.SNACK)
+                navigateToAddMealFragment(MealType.SNACK)
             }
         }
     }
 
-    private fun navigateToAddMeal(mealType: MealType) {
-        findNavController().navigate(
-            MealListFragmentDirections.actionMealListFragmentToAddMealFragment(mealType)
-        )
+    private fun navigateToAddMealFragment(mealType: MealType) {
+        val bundle = bundleOf("mealType" to mealType)
+        findNavController().navigate(R.id.action_mealListFragment_to_addMealFragment, bundle)
     }
 
     private fun updateCalorieCalculations(groupedMeals: Map<MealType, List<Meal>>) {

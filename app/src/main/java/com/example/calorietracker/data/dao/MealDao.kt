@@ -8,17 +8,28 @@ import java.time.LocalDateTime
 
 @Dao
 interface MealDao {
-    @Query("SELECT * FROM meals WHERE dateTime BETWEEN :startDate AND :endDate")
+    @Query("SELECT * FROM meals ORDER BY dateTime DESC")
+    fun getAllMeals(): Flow<List<Meal>>
+
+    @Query("""
+        SELECT * FROM meals 
+        WHERE dateTime >= :startDate AND dateTime < :endDate 
+        ORDER BY dateTime DESC
+    """)
     fun getMealsByDateRange(startDate: LocalDateTime, endDate: LocalDateTime): Flow<List<Meal>>
 
-    @Query("SELECT * FROM meals WHERE type = :mealType AND dateTime BETWEEN :startDate AND :endDate")
+    @Query("""
+        SELECT * FROM meals 
+        WHERE type = :mealType AND dateTime >= :startDate AND dateTime < :endDate 
+        ORDER BY dateTime DESC
+    """)
     fun getMealsByTypeAndDateRange(
         mealType: MealType,
         startDate: LocalDateTime,
         endDate: LocalDateTime
     ): Flow<List<Meal>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertMeal(meal: Meal): Long
 
     @Update
@@ -30,8 +41,16 @@ interface MealDao {
     @Query("SELECT * FROM meals WHERE id = :id")
     suspend fun getMealById(id: Long): Meal?
 
-    @Query("SELECT * FROM meals ORDER BY dateTime DESC")
-    fun getAllMeals(): Flow<List<Meal>>
+    // Bugünün öğünlerini getiren fonksiyonu güncelliyoruz
+    @Query("""
+        SELECT * FROM meals 
+        WHERE dateTime >= :startOfDay AND dateTime < :endOfDay
+        ORDER BY dateTime DESC
+    """)
+    fun getDailyMeals(
+        startOfDay: LocalDateTime = LocalDateTime.now().toLocalDate().atStartOfDay(),
+        endOfDay: LocalDateTime = LocalDateTime.now().toLocalDate().plusDays(1).atStartOfDay()
+    ): Flow<List<Meal>>
 }
 
 data class MealWithNutrients(

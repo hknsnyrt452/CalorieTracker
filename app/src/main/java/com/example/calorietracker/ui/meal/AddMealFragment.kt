@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.calorietracker.R
 import com.example.calorietracker.data.entity.Food
 import com.example.calorietracker.data.entity.MealType
@@ -20,6 +21,7 @@ class AddMealFragment : Fragment(R.layout.fragment_add_meal) {
     private val binding get() = _binding!!
     private val viewModel: AddMealViewModel by viewModels()
     private var foodList: List<Food> = emptyList()
+    private val args: AddMealFragmentArgs by navArgs()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -27,6 +29,17 @@ class AddMealFragment : Fragment(R.layout.fragment_add_meal) {
 
         setupViews()
         observeFoods()
+        setInitialMealType()
+    }
+
+    private fun setInitialMealType() {
+        val radioButtonId = when (args.mealType) {
+            MealType.BREAKFAST -> R.id.rbBreakfast
+            MealType.LUNCH -> R.id.rbLunch
+            MealType.DINNER -> R.id.rbDinner
+            MealType.SNACK -> R.id.rbSnack
+        }
+        binding.rgMealType.check(radioButtonId)
     }
 
     private fun observeFoods() {
